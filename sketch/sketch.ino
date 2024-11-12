@@ -11,6 +11,8 @@
 #include "SD.h" 
 #include "SPI.h"
 #include "RTClib.h"
+#include <HTTPClient.h>
+#include "sketch.h"
 
 RTC_DS3231 myRTC;    
 
@@ -23,6 +25,8 @@ const int sd_pin = A5;        // SD module chip select pin
 const int ms_sample = 2000;   // [1/1000 sec] time between samples
 long t_sample;
 int m_dist;
+char* SSID = "Pixel_4304";
+char* PASS = "Stupendous4-Racecar";
 
 
 void get_distance() {
@@ -35,11 +39,76 @@ void wait_for_sample() {
   }
 }
 
+void ping_google() {
+    IPAddress ip = IPAddress(8, 8, 8, 8);
+    if (Ping.ping(ip)) {
+        Serial.println(Ping.averageTime());
+    } else {
+        Serial.println("Failed to ping");
+    }
+}
+
+char * get_box_token(char * client_id, char * client_secret) {
+    if (WiFi.status() == WL_CONNECTED) {
+        HTTPClient http;
+        http.begin("https://api.box.com/oauth2/token");
+        http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+        String body = "grant_type=client_credentials&client_id=" + String(client_id) + "&client_secret=" + String(client_secret);
+        int httpResponseCode = http.POST(body);
+        if (httpResponseCode > 0) {
+            String response = http.getString();
+            Serial.println(httpResponseCode);
+            Serial.println(response);
+            return response.c_str();
+        } else {
+            Serial.print("Error on sending POST: ");
+            Serial.println(httpResponseCode);
+            return NULL;
+        }
+        http.end();
+    } else {
+        Serial.println("WiFi Disconnected");
+        return NULL;
+    }
+}
+
+void upload_to_box(char *filename, char *token) {
+    if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    http.begin("https://upload.box.com/api/2.0/files/content");
+    http.addHeader("Authorization", "Bearer " + String(token));
+    http.addHeader("Content-Type", "multipart/form-data");
+    String attributes = "{\"name\":\"" + String(filename) + "\", \"parent\":{\"id\":\"0\"}}";
+    http.addHeader("attributes", attributes);
+    File file = SD.open(filename, "r"); // TODO: change to SD.open
+    if (!file) {
+      Serial.println("Failed to open file for reading");
+      return;
+    }
+
+    int httpResponseCode = http.sendRequest("POST", &file, file.size());
+
+    if (httpResponseCode > 0) {
+      String response = http.getString();
+      Serial.println(httpResponseCode);
+      Serial.println(response);
+    } else {
+      Serial.print("Error on sending POST: ");
+      Serial.println(httpResponseCode);
+    }
+
+    file.close();
+    http.end();
+  } else {
+    Serial.println("WiFi Disconnected");
+  }
+}
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
 
-  WiFi.begin("Pixel_4304", "Stupendous4-Racecar");
+  WiFi.begin(SSID, PASS);
     Serial.println("Connecting to WiFi...");
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
@@ -82,60 +151,4 @@ void loop() {
     Serial.println("/datalog.txt");
   }
   delay(ms_sample);    // actual sample time is SLIGHTLY more than this
-}
-
-
-// Code for LoRa mode on ESP32
-// void init_wifi(wifi_mode_t mode)
-// {
-//     const uint8_t protocol = WIFI_PROTOCOL_LR;
-//     tcpip_adapter_init();
-//     ESP_ERROR_CHECK( esp_event_loop_init(event_handler, NULL) );
-//     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-//     ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
-//     ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_RAM) );
-//     ESP_ERROR_CHECK( esp_wifi_set_mode(mode) );
-//     wifi_event_group = xEventGroupCreate();
-
-//     if (mode == WIFI_MODE_STA) {
-//         ESP_ERROR_CHECK( esp_wifi_set_protocol(WIFI_IF_STA, protocol) );
-//         wifi_config_t config = {
-//             .sta = {
-//                 .ssid = ap_name,
-//                 .password = pass,
-//                 .bssid_set = false
-//             }
-//         };
-//         ESP_ERROR_CHECK( esp_wifi_set_config(WIFI_IF_STA, &config) );
-//         ESP_ERROR_CHECK( esp_wifi_start() );
-//         ESP_ERROR_CHECK( esp_wifi_connect() );
-
-//         xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT,
-//                             false, true, portMAX_DELAY);
-//         ESP_LOGI(TAG, "Connected to AP");
-//     } else {
-//         ESP_ERROR_CHECK( esp_wifi_set_protocol(WIFI_IF_AP, protocol) );
-//         wifi_config_t config = {
-//             .ap = {
-//                 .ssid = ap_name,
-//                 .password = pass,
-//                 .ssid_len = 0,
-//                 .authmode = WIFI_AUTH_WPA_WPA2_PSK,
-//                 .ssid_hidden = false,
-//                 .max_connection = 3,
-//                 .beacon_interval = 100,
-//             }
-//         };
-//         ESP_ERROR_CHECK( esp_wifi_set_config(WIFI_IF_AP, &config) );
-//         ESP_ERROR_CHECK( esp_wifi_start() );
-//     }
-// }
-
-void ping_google() {
-    IPAddress ip = IPAddress(8, 8, 8, 8);
-    if (Ping.ping(ip)) {
-        Serial.println(Ping.averageTime());
-    } else {
-        Serial.println("Failed to ping");
-    }
 }
