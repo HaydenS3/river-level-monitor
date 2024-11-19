@@ -12,16 +12,28 @@ const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = 0;
 const int   daylightOffset_sec = 3600;
 
+//pins
+const int trigPin = 27;
+const int echoPin = 12;
 const int sd_pin = A5;        // SD module chip select pin
-/*AdafruitIO_Feed *time_feed = io.feed("timefeed");
-AdafruitIO_Feed *dist_feed = io.feed("distfeed");
-*/
+
 // Other stuff
-int m_dist;
+long m_dist;
 const int ms_sample = 1000;  
 
 void get_distance() {
-  m_dist = 6;
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(5);
+
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  long duration = pulseIn(echoPin, HIGH,);
+  long distance = duration * 0.034 / 2;
+
+  //Serial.print("Distance: ");
+  m_dist = distance;
 }
 
 void printLocalTime(){
@@ -63,22 +75,27 @@ void setup() {
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
   printLocalTime();
 
+
   //disconnect WiFi as it's no longer needed
-  WiFi.disconnect(true);
-  WiFi.mode(WIFI_OFF);
+  
+  //WiFi.disconnect(true);
+  //WiFi.mode(WIFI_OFF);
 
   // Chip select for SD card
   pinMode(sd_pin, OUTPUT);
   digitalWrite(sd_pin, LOW);
+
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
 }
 
 void loop(){
-  //io.run();
-  
+
   delay(ms_sample);
   const char * data = returnLocalTime();
   Serial.println(data);
   struct tm timeinfo;
+
   get_distance();
   
   File data_file = SD.open("/datalog2.txt", FILE_APPEND);    // open the file
@@ -90,11 +107,4 @@ void loop(){
     Serial.print("error opening ");
     Serial.println("/datalog2.txt");
   }
-/*
-  dist_feed->save(mm_dist);
-  time_feed->save(returnLocalTime());
-  t_sample = millis();
-
-  // Wait for next sample
-  wait_for_sample();*/
 }
