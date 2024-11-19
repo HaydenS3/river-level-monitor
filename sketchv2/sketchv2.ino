@@ -66,6 +66,10 @@ void setup() {
   //disconnect WiFi as it's no longer needed
   WiFi.disconnect(true);
   WiFi.mode(WIFI_OFF);
+
+  // Chip select for SD card
+  pinMode(sd_pin, OUTPUT);
+  digitalWrite(sd_pin, LOW);
 }
 
 void loop(){

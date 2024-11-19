@@ -24,12 +24,12 @@ void ping_google() {
     }
 }
 
-const char * get_box_token(const char * client_id, const char * client_secret) {
+const char * get_box_token(const char * client_id, const char * client_secret, const char * enterprise_id) {
     if (WiFi.status() == WL_CONNECTED) {
         HTTPClient http;
         http.begin("https://api.box.com/oauth2/token");
         http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-        String body = "grant_type=client_credentials&client_id=" + String(client_id) + "&client_secret=" + String(client_secret);
+        String body = "grant_type=client_credentials&client_id=" + String(client_id) + "&client_secret=" + String(client_secret) + "&box_subject_type=enterprise&box_subject_id=" + String(enterprise_id);
         int httpResponseCode = http.POST(body);
         if (httpResponseCode > 0) {
             String response = http.getString();
@@ -97,6 +97,6 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
     ping_google();
-    const char * token = get_box_token(boxTest.CLIENT_ID, boxTest.CLIENT_SECRET);
+    const char * token = get_box_token(boxTest.CLIENT_ID, boxTest.CLIENT_SECRET, boxTest.ENTERPRISE_ID);
     Serial.println(token);
 }
