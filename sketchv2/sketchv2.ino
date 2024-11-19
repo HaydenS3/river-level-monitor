@@ -21,7 +21,7 @@ int m_dist;
 const int ms_sample = 1000;  
 
 void get_distance() {
-  m_dist = 5;
+  m_dist = 6;
 }
 
 void printLocalTime(){
@@ -33,14 +33,16 @@ void printLocalTime(){
   Serial.println(&timeinfo, "%m:%d:%y %H:%M:%S");
 }
 
-const char * returnLocalTime(){
+const char* returnLocalTime() {
+  static char timeString[20];
   struct tm timeinfo;
-  if(!getLocalTime(&timeinfo)){
-    return "Error";
+  if (!getLocalTime(&timeinfo)) {
+    Serial.println("Failed to obtain time");
+    return "00:00:00 00:00:00";
   }
-  const char * time = (&timeinfo, "%m:%d:%y %H:%M:%S");
-  return time;
-} 
+  strftime(timeString, sizeof(timeString), "%m:%d:%y %H:%M:%S", &timeinfo);
+  return timeString;
+}
 
 void setup() {
   // put your setup code here, to run once:
@@ -70,14 +72,15 @@ void loop(){
   //io.run();
   
   delay(ms_sample);
-  printLocalTime();
+  const char * data = returnLocalTime();
+  Serial.println(data);
   struct tm timeinfo;
   get_distance();
   
   File data_file = SD.open("/datalog2.txt", FILE_APPEND);    // open the file
   if (data_file) {
     data_file.printf("%d , ", m_dist);
-    data_file.println(returnLocalTime());
+    data_file.println(data);
     data_file.close();
   } else {
     Serial.print("error opening ");
