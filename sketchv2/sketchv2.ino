@@ -45,7 +45,7 @@ String returnLocalTime(){
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-
+  SD.begin();
   // Connect to Wi-Fi
   Serial.print("Connecting to ");
   Serial.println(ssid);
@@ -71,15 +71,17 @@ void loop(){
   
   delay(ms_sample);
   printLocalTime();
+  struct tm timeinfo;
   get_distance();
   
-  File data_file = SD.open("/datalog.txt", FILE_APPEND);    // open the file
+  File data_file = SD.open("/datalog2.txt", FILE_APPEND);    // open the file
   if (data_file) {
-    data_file.printf("%d, %s", m_dist, returnLocalTime());
+    data_file.printf("%d , ", m_dist);
+    data_file.println(returnLocalTime());
     data_file.close();
   } else {
     Serial.print("error opening ");
-    Serial.println("/datalog.txt");
+    Serial.println("/datalog2.txt");
   }
 /*
   dist_feed->save(mm_dist);
