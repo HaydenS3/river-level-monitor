@@ -8,8 +8,10 @@
 // char* PASS = "Stupendous4-Racecar";
 // char* SSID = "Peter's iPhone";
 // char* PASS = "12345678";
-char* SSID = "jeff";
-char* PASS = "12345678";
+// char* SSID = "jeff";
+// char* PASS = "12345678";
+char* SSID = "wustl-guest-2.0";
+char* PASS = "";
 
 BoxTest boxTest;
 

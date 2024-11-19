@@ -33,13 +33,13 @@ void printLocalTime(){
   Serial.println(&timeinfo, "%m:%d:%y %H:%M:%S");
 }
 
-String returnLocalTime(){
+const char * returnLocalTime(){
   struct tm timeinfo;
   if(!getLocalTime(&timeinfo)){
-    return String("Error");
+    return "Error";
   }
-  String time = (&timeinfo, "%m:%d:%y %H:%M:%S");
-  return String(time);
+  const char * time = (&timeinfo, "%m:%d:%y %H:%M:%S");
+  return time;
 } 
 
 void setup() {
