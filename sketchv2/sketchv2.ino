@@ -13,8 +13,8 @@ const long  gmtOffset_sec = 0;
 const int   daylightOffset_sec = 3600;
 
 //pins
-const int trigPin = 27;
-const int echoPin = 12;
+const int trigPin = 27; // on pcb 33
+const int echoPin = 12; // on pcb 32
 const int sd_pin = A5;        // SD module chip select pin
 
 // Other stuff
@@ -23,13 +23,13 @@ const int ms_sample = 1000;
 
 void get_distance() {
   digitalWrite(trigPin, LOW);
-  delayMicroseconds(5);
+  delayMicroseconds(1000); //delay for recording the US sensor
 
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(1000);
   digitalWrite(trigPin, LOW);
   
-  long duration = pulseIn(echoPin, HIGH,);
+  long duration = pulseIn(echoPin, LOW);
   long distance = duration * 0.034 / 2;
 
   //Serial.print("Distance: ");
@@ -100,7 +100,7 @@ void loop(){
   
   File data_file = SD.open("/datalog2.txt", FILE_APPEND);    // open the file
   if (data_file) {
-    data_file.printf("%d , ", m_dist);
+    data_file.printf("%d ", m_dist);
     data_file.println(data);
     data_file.close();
   } else {
