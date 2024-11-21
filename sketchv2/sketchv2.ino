@@ -19,14 +19,14 @@ const int sd_pin = A5;        // SD module chip select pin
 
 // Other stuff
 long m_dist;
-const int ms_sample = 1000;  
+const int ms_sample = 10000;  
 
 void get_distance() {
   digitalWrite(trigPin, LOW);
-  delayMicroseconds(1000); //delay for recording the US sensor
+  //delayMicroseconds(1000); //delay for recording the US sensor
 
   digitalWrite(trigPin, LOW);
-  delayMicroseconds(1000);
+  //delayMicroseconds(1000);
   digitalWrite(trigPin, LOW);
   
   long duration = pulseIn(echoPin, LOW);
@@ -100,8 +100,8 @@ void loop(){
   
   File data_file = SD.open("/datalog2.txt", FILE_APPEND);    // open the file
   if (data_file) {
-    data_file.printf("%d ", m_dist);
-    data_file.println(data);
+    data_file.print(data);
+    data_file.printf(",%d\n", m_dist);
     data_file.close();
   } else {
     Serial.print("error opening ");
