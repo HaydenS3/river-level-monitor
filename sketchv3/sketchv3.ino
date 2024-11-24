@@ -15,8 +15,8 @@ const long  gmtOffset_sec = 0;
 const int   daylightOffset_sec = 3600;
 
 //pins
-const int trigPin = 27;
-const int echoPin = 12;
+const int trigPin = 33;
+const int echoPin = 32;
 const int sd_pin = A5;        // SD module chip select pin
 
 // Other stuff
@@ -31,8 +31,6 @@ void write_channel_feed(const char * data, const char * key) {
         int httpResponseCode = http.GET();
         if (httpResponseCode > 0) {
             String response = http.getString();
-            Serial.println(httpResponseCode);
-            Serial.println(response);
         } else {
             Serial.print("Error on sending GET: ");
             Serial.println(httpResponseCode);
@@ -113,6 +111,7 @@ void loop(){
   struct tm timeinfo;
 
   long distance = get_distance();
+  Serial.println(distance);
   
   File data_file = SD.open("/datalog2.txt", FILE_APPEND);    // open the file
   if (data_file) {
