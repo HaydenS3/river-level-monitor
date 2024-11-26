@@ -5,8 +5,13 @@
 // char* PASS = "Stupendous4-Racecar";
 // char* SSID = "Peter's iPhone";
 // char* PASS = "12345678";
-char* SSID = "jeff";
-char* PASS = "12345678";
+// char* SSID = "jeff";
+// char* PASS = "12345678";
+// char* SSID = "Ruth's iphone 12";
+// char* PASS = "ruthshotspot";
+char* SSID = "CentComWireless";
+char* PASS = "6801Delmar";
+
 
 void ping_google() {
     IPAddress ip = IPAddress(8, 8, 8, 8);

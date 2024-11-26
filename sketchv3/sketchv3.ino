@@ -7,8 +7,12 @@
 #include "time.h"
 #include "sketchv3.h"
 
-const char* ssid = "wustl-guest-2.0";
-const char* password = "";
+// const char* ssid = "CentComWireless";
+// const char* password = "6801Delmar";
+// const char* ssid = "Catryn (2)";
+// const char* password = "PrincessVenezuela";
+// const char* ssid = "Catryn (2)";
+// const char* password = "PrincessVenezuela";
 
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = 0;
@@ -20,7 +24,7 @@ const int echoPin = 32;
 const int sd_pin = A5;        // SD module chip select pin
 
 // Other stuff
-const int ms_sample = 15000;  
+const int ms_sample = 300000;  
 
 SketchV3 sketchv3;
 
@@ -81,15 +85,15 @@ void setup() {
   Serial.begin(115200);
   SD.begin();
   // Connect to Wi-Fi
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.println("WiFi connected.");
+  // Serial.print("Connecting to ");
+  // Serial.println(ssid);
+  // WiFi.begin(ssid, password);
+  // while (WiFi.status() != WL_CONNECTED) {
+  //   delay(500);
+  //   Serial.print(".");
+  // }
+  // Serial.println("");
+  // Serial.println("WiFi connected.");
   
   // Init and get the time
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
@@ -113,14 +117,14 @@ void loop(){
   long distance = get_distance();
   Serial.println(distance);
   
-  File data_file = SD.open("/datalog2.txt", FILE_APPEND);    // open the file
+  File data_file = SD.open("/datalog3.txt", FILE_APPEND);    // open the file
   if (data_file) {
-    data_file.printf("%d , ", distance);
-    data_file.println(data);
+    data_file.print(millis()); // TODO: Change back to data
+    data_file.printf(",%d\n", distance);
     data_file.close();
   } else {
     Serial.print("error opening ");
-    Serial.println("/datalog2.txt");
+    Serial.println("/datalog3.txt");
   }
 
   char buffer[10];
