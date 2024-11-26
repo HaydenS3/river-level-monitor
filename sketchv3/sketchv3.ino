@@ -108,8 +108,6 @@ void setup() {
 }
 
 void loop(){
-
-  delay(ms_sample);
   const char * data = returnLocalTime();
   Serial.println(data);
   struct tm timeinfo;
@@ -130,4 +128,5 @@ void loop(){
   char buffer[10];
   sprintf(buffer, "%d", distance);
   write_channel_feed(buffer, sketchv3.API_KEY);
+  delay(ms_sample);
 }
