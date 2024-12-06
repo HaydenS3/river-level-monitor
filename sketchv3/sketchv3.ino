@@ -7,8 +7,8 @@
 #include "time.h"
 #include "sketchv3.h"
 
-// const char* ssid = "CentComWireless";
-// const char* password = "6801Delmar";
+const char* ssid = "CentComWireless";
+const char* password = "6801Delmar";
 // const char* ssid = "Catryn (2)";
 // const char* password = "PrincessVenezuela";
 // const char* ssid = "Catryn (2)";
@@ -85,15 +85,15 @@ void setup() {
   Serial.begin(115200);
   SD.begin();
   // Connect to Wi-Fi
-  // Serial.print("Connecting to ");
-  // Serial.println(ssid);
-  // WiFi.begin(ssid, password);
-  // while (WiFi.status() != WL_CONNECTED) {
-  //   delay(500);
-  //   Serial.print(".");
-  // }
-  // Serial.println("");
-  // Serial.println("WiFi connected.");
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.println("WiFi connected.");
   
   // Init and get the time
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
@@ -119,7 +119,7 @@ void loop(){
   
   File data_file = SD.open("/datalog3.txt", FILE_APPEND);    // open the file
   if (data_file) {
-    data_file.print(millis()); // TODO: Change back to data
+    data_file.print(data);
     data_file.printf(",%d\n", distance);
     data_file.close();
   } else {
